@@ -57,13 +57,22 @@ class WC_REST_Authentication {
 		$rest_prefix = trailingslashit( rest_get_url_prefix() );
 		$request_uri = esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
 
+		// Rest prefix when permalinks are disabled
+		$secondary_rest_prefix = '?rest_route=/';
+
 		// Check if the request is to the WC API endpoints.
 		$woocommerce = ( false !== strpos( $request_uri, $rest_prefix . 'wc/' ) );
 
-		// Allow third party plugins use our authentication methods.
+		// Check if the request is to the WC API endpoints when permalinks are disabled
+		$woocommerce_secondary = ( false !== strpos( $request_uri, $secondary_rest_prefix . 'wc/' ) );
+
+        // Allow third party plugins use our authentication methods.
 		$third_party = ( false !== strpos( $request_uri, $rest_prefix . 'wc-' ) );
 
-		return apply_filters( 'woocommerce_rest_is_request_to_rest_api', $woocommerce || $third_party );
+		// Allow third party plugins use our authentication methods when permalinks are disabled
+		$third_party_secondary = ( false !== strpos( $request_uri, $secondary_rest_prefix . 'wc-' ) );
+
+		return apply_filters( 'woocommerce_rest_is_request_to_rest_api', $woocommerce || $third_party || $woocommerce_secondary || $third_party_secondary );
 	}
 
 	/**
